@@ -5,8 +5,9 @@ from rest_framework.views import APIView
 from rest_framework import permissions
 from rest_framework.response import Response
 from blog.models import Article as ArticleModel
+from django.utils import timezone
 
-from ai.permissions import RegistedMoretThanThreeUser
+from ai.permissions import IsAdminOrIsAuthenticatedReadOnly
 
 
 # Create your views here.
@@ -14,12 +15,17 @@ from ai.permissions import RegistedMoretThanThreeUser
 
 class ArticleView(APIView): # CBV 방식
     # 로그인 한 사용자의 게시글 목록 return
-    permission_classes = [RegistedMoretThanThreeUser]
+    permission_classes = [IsAdminOrIsAuthenticatedReadOnly]
 
     def get(self, request):
         user = request.user
+        today = timezone.now()
 
-        articles = ArticleModel.objects.filter(author=user)
+        articles = ArticleModel.objects.filter(
+            exposure_start_date__lte = today,
+            exposure_end_date__gte = today
+        ).order_by("-id")
+
         titles = []
 
         for article in articles:

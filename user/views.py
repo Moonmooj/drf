@@ -7,7 +7,8 @@ from django.db.models import F
 from user.models import UserProfile
 from user.serializers import UserSerializer
 
-from ai.permissions import RegistedMoretThanAWeekUser
+from ai.permissions import RegistedMoretThanThreeUser
+from ai.permissions import IsAdminOrIsAuthenticatedReadOnly
 
 # Create your views here.
 
@@ -15,7 +16,7 @@ class UserView(APIView): # CBV 방식
     # permission_classes = [permissions.AllowAny] # 누구나 view 조회 가능
     # permission_classes = [permissions.IsAdminUser] # admin만 view 조회 가능
     # permission_classes = [permissions.IsAuthenticated] # 로그인 된 사용자만 view 조회 가능
-    permission_classes = [RegistedMoretThanAWeekUser]
+    permission_classes = [IsAdminOrIsAuthenticatedReadOnly]
     # 사용자 정보조회
     def get(self, request):
         return Response(UserSerializer(request.user).data)
@@ -33,6 +34,7 @@ class UserView(APIView): # CBV 방식
         
      # 회원가입
     def post(self, request):
+        user = request.user
         return Response({'message': 'post method!!'})
 
      # 회원 정보 수정
