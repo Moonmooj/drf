@@ -15,7 +15,7 @@ from ai.permissions import IsAdminOrIsAuthenticatedReadOnly
 
 class ArticleView(APIView): # CBV 방식
     # 로그인 한 사용자의 게시글 목록 return
-    permission_classes = [IsAdminOrIsAuthenticatedReadOnly]
+    # permission_classes = [IsAdminOrIsAuthenticatedReadOnly]
 
     def get(self, request):
         user = request.user
@@ -38,6 +38,8 @@ class ArticleView(APIView): # CBV 방식
         title = request.data.get('title','')
         categorys = request.data.pop('category')
         contents = request.data.get('contents','')
+        exposure_start_date = request.data.get('exposure_start_date')
+        exposure_end_date = request.data.get('exposure_start_date')
 
         if len(title) <= 5 :
             return Response({"error":"title이 5자 이하라면 게시글을 작성할 수 없습니다."})
@@ -50,7 +52,9 @@ class ArticleView(APIView): # CBV 방식
         article = ArticleModel(
             author = user,
             title = title,
-            contents = contents
+            contents = contents,
+            exposure_start_date = exposure_start_date,
+            exposure_end_date = exposure_end_date
         )
 
         article.save()

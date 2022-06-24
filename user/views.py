@@ -1,11 +1,13 @@
+from functools import partial
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView #  permission_classes를 이용하기 위해 임포트해서 씀 
-from rest_framework import permissions
+from rest_framework import permissions,status
 from django.contrib.auth import login, logout, authenticate
 from django.db.models import F
-from user.models import UserProfile
+from user.models import UserProfile as UserProfileModel
 from user.serializers import UserSerializer
+from user.models import User as UserModel
 
 from ai.permissions import RegistedMoretThanThreeUser
 from ai.permissions import IsAdminOrIsAuthenticatedReadOnly
@@ -31,16 +33,28 @@ class UserView(APIView): # CBV 방식
             # print(f"hobby : {hobby.name} / hobby members : {hobby_members}")
 
         
-        
      # 회원가입
     def post(self, request):
-        user = request.user
-        return Response({'message': 'post method!!'})
+        user_serializer = UserSerializer(data=request.data)
+
+        if user_serializer.is_valid():
+            user_serializer.save()
+            return Response(user_serializer.data, status=status.HTTP_200_OK)
+
+        return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
      # 회원 정보 수정
-    def put(self, request):
-        return Response({'message': 'put method!!'})
-    
+    def put(self, request, obj_id):
+        user = UserModel.objects.get(id=obj_id)
+        user_serializer = UserSerializer(user, data=request.data, partial=True) #수정할때는 어떤걸 수정할건지도 넣어줘야함
+
+        if user_serializer.is_valid():
+            user_serializer.save()
+            return Response(user_serializer.data, status=status.HTTP_200_OK)
+
+        return Response(user_serializer.errors, statis=status.HTTP_400_BAD_REQUEST)
+
+        
      # 회원 탈퇴
     def delete(self, request):
         return Response({'message': 'delete method!!'})

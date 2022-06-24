@@ -30,7 +30,11 @@ class RegistedMoretThanThreeUser(BasePermission):
         
         return bool(request.user.join_date < (timezone.now() - timedelta(minutes=1)))
 
+class ProductWriteMoretThanThreedaysUser(BasePermission):
 
+    def has_permission(self, request, view):
+        if request.method == 'POST':
+            return bool(request.user and request.user.join_date < (timezone.now() - timedelta(days=1)))
 
 
 class GenericAPIException(APIException):
@@ -62,3 +66,5 @@ class IsAdminOrIsAuthenticatedReadOnly(BasePermission):
             return True
 
         return False
+
+    

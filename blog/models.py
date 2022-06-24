@@ -18,8 +18,7 @@ class Article(models.Model):
     category = models.ManyToManyField(Category, verbose_name='카테고리')
     contents = models.TextField('내용')
     exposure_start_date = models.DateField('노출 시작 일자',default=timezone.now())
-    exposure_end_date = models.DateField('노출 종료 일자',default=timezone.now())
-    
+    exposure_end_date = models.DateField('노출 시작 일자',default=timezone.now())
 
     def __str__(self):
         return f"{self.author.username} 님이 작성하신 글입니다."
